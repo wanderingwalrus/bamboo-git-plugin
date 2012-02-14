@@ -37,6 +37,7 @@ import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.TagOpt;
 import org.eclipse.jgit.transport.Transport;
+import org.eclipse.jgit.transport.TransportHttp;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
@@ -465,6 +466,19 @@ public class GitOperationHelper
             {
                 transport = new TransportAllTrustingHttps(localRepository, uri);
             }
+            else if ("http".equals(uri.getScheme()))
+
+            {
+                class TransportHttpHack extends TransportHttp
+                {
+                    TransportHttpHack(FileRepository localRepository, URIish uri) throws NotSupportedException
+
+                    {
+                        super(localRepository, uri);
+                    }
+                }
+                transport = new TransportHttpHack(localRepository, uri);
+            }
             else
             {
                 transport = Transport.open(localRepository, uri);
@@ -479,6 +493,10 @@ public class GitOperationHelper
 
                 SshSessionFactory factory = new GitSshSessionFactory(sshKey, passphrase);
                 ((SshTransport)transport).setSshSessionFactory(factory);
+                if (passphrase != null)
+                {
+                    transport.setCredentialsProvider(new TweakedUsernamePasswordCredentialsProvider("dummy", passphrase));
+                }
             }
             if (accessData.authenticationType == GitAuthenticationType.PASSWORD)
             {
