@@ -240,13 +240,14 @@ public class GitRepository extends AbstractRepository implements MavenPomAccesso
                         try
                         {
                             helper.fetch(cacheDirectory, accessData, doShallowFetch);
+                            helper.checkRevisionExistsInCacheRepository(cacheDirectory, targetRevision);
                         }
                         catch (Exception e)
                         {
                             buildLogger.addBuildLogEntry(textProvider.getText("repository.git.messages.rsRecover.failedToFetchCache", Arrays.asList(cacheDirectory)));
                             FileUtils.deleteQuietly(cacheDirectory);
                             buildLogger.addBuildLogEntry(textProvider.getText("repository.git.messages.rsRecover.cleanedCacheDirectory", Arrays.asList(cacheDirectory)));
-                            helper.fetch(cacheDirectory, accessData, doShallowFetch);
+                            helper.fetch(cacheDirectory, accessData, false);
                             buildLogger.addBuildLogEntry(textProvider.getText("repository.git.messages.rsRecover.fetchingCacheCompleted", Arrays.asList(cacheDirectory)));
                         }
 

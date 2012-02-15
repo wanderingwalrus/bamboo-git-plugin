@@ -74,6 +74,21 @@ public class GitOperationHelper
         this.textProvider = textProvider;
     }
 
+    /**
+     *
+     * @param repositoryDirectory directory where repository is fetched
+     * @param targetRevision revision to find in repository
+     * @return true if revision found
+     * @throws IOException thrown when revision not found (MissingObjectException)
+     */
+    public boolean checkRevisionExistsInCacheRepository(@NotNull File repositoryDirectory, @NotNull String targetRevision) throws IOException
+    {
+        FileRepository localRepository = createLocalRepository(repositoryDirectory, null);
+        RevWalk revWalk = new RevWalk(localRepository);
+        final RevCommit targetCommit = revWalk.parseCommit(localRepository.resolve(targetRevision));
+        return targetCommit != null;
+    }
+
     @NotNull
     public String obtainLatestRevision(@NotNull final GitRepositoryAccessData repositoryData) throws RepositoryException
     {
